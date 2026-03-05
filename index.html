@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#C0392B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>OpenClaw Guide 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script>
+const manifest={name:"OpenClaw Guide 2026",short_name:"OpenClaw",start_url:".",display:"standalone",background_color:"#0D0D0D",theme_color:"#C0392B",icons:[{src:"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' fill='%23C0392B' rx='32'/><text y='130' x='28' font-size='120' fill='white'>✦</text></svg>",sizes:"192x192",type:"image/svg+xml"}]};
+const mb=new Blob([JSON.stringify(manifest)],{type:'application/json'});
+document.write('<link rel="manifest" href="'+URL.createObjectURL(mb)+'">');
+</script>
+<style>
+/* ── TOKENS ── */
+:root {
+  --vp:#C0392B; --vd:#922B21; --vs:#E74C3C; --vg:rgba(192,57,43,.35); --vsu:rgba(192,57,43,.12);
+  --c0:#0D0D0D; --c1:#141414; --c2:#1A1A1A; --sl:#2A2A2A; --sm:#3A3A3A;
+  --f0:#F5F5F5; --f1:#BDBDBD; --f2:#757575;
+  --fu:'Syne',sans-serif; --fm:'JetBrains Mono',monospace;
+  --ss:.75rem; --sb:.9375rem; --st:1.25rem; --sh2:2.25rem;
+  --s1:8px; --s2:16px; --s3:24px; --s4:32px;
+  --r:12px; --rs:8px;
+  --topH:64px; --navH:68px;
+}
+
+/* ── RESET ── */
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html, body { height:100%; background:var(--c0); color:var(--f0); font-family:var(--fu); font-size:var(--sb); -webkit-font-smoothing:antialiased; overflow:hidden; }
+h1 { font-size:var(--sh2); font-weight:800; line-height:1.1; letter-spacing:-.03em; }
+h2 { font-size:var(--st); font-weight:700; line-height:1.3; letter-spacing:-.01em; }
+h3 { font-size:var(--sb); font-weight:700; line-height:1.4; }
+p  { font-size:var(--sb); line-height:1.65; color:var(--f1); }
+:focus-visible { outline:2px solid var(--vs); outline-offset:3px; border-radius:4px; }
+::-webkit-scrollbar { width:3px; height:3px; }
+::-webkit-scrollbar-track { background:var(--c1); }
+::-webkit-scrollbar-thumb { background:var(--sm); border-radius:2px; }
+
+/* ── PROGRESS BAR ── */
+#progressBar {
+  position:fixed; top:0; left:0; right:0; height:3px; z-index:1000;
+  pointer-events:none;
+}
+#progressFill {
+  height:100%; width:0%;
+  background:linear-gradient(90deg,var(--vp),var(--vs));
+  box-shadow:0 0 8px var(--vg);
+  transition:width .1s linear;
+}
+
+/* ── TOPBAR ── */
+#topbar {
+  position:fixed; top:3px; left:0; right:0; height:var(--topH); z-index:100;
+  background:rgba(13,13,13,.97);
+  backdrop-filter:blur(20px) saturate(1.5);
+  -webkit-backdrop-filter:blur(20px) saturate(1.5);
+  border-bottom:1px solid var(--sl);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 var(--s2);
+}
+.tb-brand { display:flex; align-items:center; gap:var(--s1); }
+.tb-logo  { width:36px; height:36px; background:var(--vp); border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:800; box-shadow:0 0 16px var(--vg); flex-shrink:0; }
+.tb-title { font-size:var(--sb); font-weight:700; letter-spacing:.02em; }
+.tb-acts  { display:flex; gap:var(--s1); align-items:center; }
+.tb-ver   { font-family:var(--fm); font-size:.7rem; color:var(--vs); background:var(--vsu); padding:3px 10px; border-radius:100px; }
+.icon-btn { width:44px; height:44px; background:var(--c2); border:1px solid var(--sl); border-radius:var(--rs); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px; transition:background .15s; color:var(--f1); }
+.icon-btn:hover { background:var(--sl); color:var(--f0); }
+
+/* ── SCROLL CONTAINER ── */
+/* THE KEY FIX: one fixed container that fills the space between topbar and nav */
+#scrollWrap {
+  position:fixed;
+  top:calc(var(--topH) + 3px); /* below progress bar + topbar */
+  left:0; right:0;
+  bottom:var(--navH);
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+}
+
+/* ── PAGES ── */
+.page { display:none; }
+.page.active { display:block; animation:fadeUp .2s ease; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── CONTENT WRAPPER ── */
+.pi {
+  padding:var(--s3) var(--s2) var(--s4);
+  max-width:640px;
+  margin:0 auto;
+  width:100%;
+}
+
+/* ── BOTTOM NAV ── */
+#bottomNav {
+  position:fixed; bottom:0; left:0; right:0; height:var(--navH); z-index:100;
+  background:rgba(14,14,14,.99);
+  backdrop-filter:blur(24px) saturate(1.8);
+  -webkit-backdrop-filter:blur(24px) saturate(1.8);
+  border-top:1px solid var(--sl);
+  display:flex; align-items:stretch;
+  padding:0 4px;
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.nav-item {
+  flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:4px; cursor:pointer; border:none; background:transparent;
+  color:var(--f2); padding:8px 2px; transition:color .18s;
+  font-family:var(--fu); border-top:2px solid transparent;
+  min-height:44px;
+}
+.nav-item:hover { color:var(--f1); }
+.nav-item.active { color:var(--vs); border-top-color:var(--vp); }
+.nav-iw { width:38px; height:28px; display:flex; align-items:center; justify-content:center; border-radius:var(--rs); transition:background .18s; }
+.nav-item.active .nav-iw { background:var(--vsu); }
+.nav-ico { width:22px; height:22px; display:block; }
+.nav-lbl { font-size:9px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }
+
+/* ── HERO ── */
+.hero { padding:var(--s4) var(--s2) var(--s3); position:relative; }
+.hero::before { content:''; position:absolute; top:-40px; right:-40px; width:200px; height:200px; background:radial-gradient(circle,rgba(192,57,43,.18) 0%,transparent 70%); pointer-events:none; }
+.he  { font-family:var(--fm); font-size:.7rem; color:var(--vs); letter-spacing:.14em; text-transform:uppercase; margin-bottom:var(--s1); position:relative; }
+.hero h1 { margin-bottom:var(--s2); position:relative; }
+.hs  { color:var(--f1); margin-bottom:var(--s3); max-width:480px; position:relative; }
+.hc  { display:flex; flex-wrap:wrap; gap:var(--s1); position:relative; }
+.hch { padding:4px 12px; border-radius:100px; background:var(--sl); border:1px solid var(--sm); font-size:.7rem; font-weight:600; color:var(--f1); }
+
+/* ── SECTION HEAD ── */
+.sh { margin-bottom:var(--s3); }
+.sh h2 { margin-bottom:6px; }
+.sh p  { font-size:var(--ss); color:var(--f1); }
+.sdiv  { height:1px; background:linear-gradient(to right,var(--vp),transparent); margin:var(--s4) 0; }
+
+/* ── CARDS ── */
+.card { background:var(--c2); border:1px solid var(--sl); border-radius:var(--r); padding:var(--s3); transition:border-color .2s; }
+.card:hover { border-color:var(--sm); }
+.ca  { border-left:3px solid var(--vp); }
+.ct  { font-size:var(--sb); font-weight:700; color:var(--f0); }
+.cd  { font-size:var(--ss); color:var(--f2); margin-top:4px; }
+/* badge row inside card */
+.cr  { display:flex; flex-wrap:wrap; gap:6px; margin:var(--s1) 0; }
+
+/* ── BADGES ── */
+.badge { display:inline-flex; align-items:center; padding:3px 10px; border-radius:100px; font-size:.7rem; font-weight:600; font-family:var(--fm); white-space:nowrap; }
+.bg  { background:rgba(39,174,96,.15); color:#2ecc71; border:1px solid rgba(46,204,113,.3); }
+.br  { background:rgba(192,57,43,.15); color:var(--vs); border:1px solid var(--vg); }
+.by  { background:rgba(241,196,15,.15); color:#f1c40f; border:1px solid rgba(241,196,15,.3); }
+.bb  { background:rgba(52,152,219,.15); color:#3498db; border:1px solid rgba(52,152,219,.3); }
+.bk  { background:var(--sl); color:var(--f1); border:1px solid var(--sm); }
+.diff-easy { background:rgba(39,174,96,.15); color:#2ecc71; border:1px solid rgba(46,204,113,.3); font-size:10px; padding:2px 8px; border-radius:100px; font-family:var(--fm); font-weight:700; white-space:nowrap; }
+.diff-med  { background:rgba(241,196,15,.15); color:#f1c40f; border:1px solid rgba(241,196,15,.3); font-size:10px; padding:2px 8px; border-radius:100px; font-family:var(--fm); font-weight:700; white-space:nowrap; }
+.diff-hard { background:rgba(192,57,43,.15); color:var(--vs); border:1px solid var(--vg); font-size:10px; padding:2px 8px; border-radius:100px; font-family:var(--fm); font-weight:700; white-space:nowrap; }
+
+/* ── STATUS DOTS ── */
+.sdot { width:8px; height:8px; border-radius:50%; display:inline-block; flex-shrink:0; }
+.sdot.g { background:#2ecc71; box-shadow:0 0 6px rgba(46,204,113,.7); animation:pg 2s infinite; }
+.sdot.r { background:var(--vs); box-shadow:0 0 6px var(--vg); }
+.sdot.y { background:#f1c40f; box-shadow:0 0 6px rgba(241,196,15,.7); animation:py 2s infinite; }
+@keyframes pg { 0%,100%{box-shadow:0 0 4px rgba(46,204,113,.4)} 50%{box-shadow:0 0 10px rgba(46,204,113,.9)} }
+@keyframes py { 0%,100%{box-shadow:0 0 4px rgba(241,196,15,.4)} 50%{box-shadow:0 0 10px rgba(241,196,15,.9)} }
+
+/* ── CODE BLOCKS ── THE BIG FIX ── */
+/* Pre must wrap, block must expand to fit all content, never clip */
+.cb {
+  background:#0F172A;
+  border:1px solid #1E3A5F;
+  border-radius:var(--rs);
+  padding:40px var(--s2) var(--s2);  /* top padding for copy button */
+  font-family:var(--fm);
+  font-size:12px;
+  line-height:1.75;
+  overflow-x:auto;
+  position:relative;
+  margin-bottom:0;
+}
+.cb pre {
+  color:#CBD5E1;
+  white-space:pre-wrap;      /* WRAPS long lines instead of overflowing */
+  word-break:break-all;
+  margin:0;
+}
+/* syntax colors */
+.ck { color:#F87171; }
+.cs { color:#86EFAC; }
+.cn { color:#93C5FD; }
+.cc { color:#64748B; font-style:italic; }
+.cf { color:#FCD34D; }
+.co { color:#C084FC; }
+/* copy button */
+.copy-btn {
+  position:absolute; top:8px; right:8px;
+  height:28px; padding:0 10px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:6px; color:#94A3B8;
+  font-family:var(--fm); font-size:10px;
+  cursor:pointer; transition:all .15s;
+  z-index:2;
+}
+.copy-btn:hover { background:var(--vp); color:white; border-color:var(--vp); }
+/* explain row below code */
+.cmd-explain {
+  background:rgba(52,152,219,.07);
+  border-left:2px solid rgba(52,152,219,.5);
+  padding:8px var(--s2);
+  font-size:11px; color:var(--f1);
+  font-family:var(--fm); line-height:1.6;
+  border-radius:0 0 var(--rs) var(--rs);
+}
+code { font-family:var(--fm); font-size:.8em; color:var(--vs); background:rgba(192,57,43,.12); padding:1px 5px; border-radius:4px; }
+
+/* ── EXPANDABLE ── */
+.et {
+  width:100%; display:flex; align-items:center; justify-content:space-between;
+  padding:var(--s2); background:var(--c2); border:1px solid var(--sl);
+  border-radius:var(--rs); cursor:pointer; font-family:var(--fu);
+  font-size:var(--sb); font-weight:600; color:var(--f0);
+  min-height:52px; transition:background .15s,border-color .15s; gap:var(--s1);
+  text-align:left;
+}
+.et:hover { background:var(--sl); border-color:var(--sm); }
+.et.open  { border-color:var(--vp); border-bottom-right-radius:0; border-bottom-left-radius:0; }
+.ei { width:18px; height:18px; transition:transform .25s; flex-shrink:0; color:var(--f2); }
+.et.open .ei { transform:rotate(180deg); color:var(--vs); }
+.eb { display:none; padding:var(--s2); background:var(--c1); border:1px solid var(--vp); border-top:none; border-bottom-left-radius:var(--rs); border-bottom-right-radius:var(--rs); }
+.eb.open { display:block; }
+.et-meta { display:flex; align-items:center; gap:var(--s1); flex:1; text-align:left; }
+
+/* ── TABLE ── */
+.tw { overflow-x:auto; border-radius:var(--rs); border:1px solid var(--sl); }
+table { width:100%; border-collapse:collapse; }
+th { background:var(--sl); padding:var(--s1) var(--s2); font-size:.7rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; text-align:left; color:var(--f1); border-bottom:1px solid var(--sm); }
+td { padding:var(--s1) var(--s2); border-bottom:1px solid var(--sl); font-size:.7rem; vertical-align:middle; color:var(--f1); }
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:rgba(255,255,255,.02); }
+td.good{color:#2ecc71} td.warn{color:#f1c40f} td.bad{color:var(--vs)}
+
+/* ── LOG VIEWER ── */
+.lv { background:var(--c0); border:1px solid var(--sl); border-radius:var(--rs); overflow:hidden; }
+.lt { display:flex; align-items:center; gap:6px; padding:var(--s1) var(--s2); background:var(--c2); border-bottom:1px solid var(--sl); flex-wrap:wrap; }
+.lfb { padding:4px 12px; border-radius:100px; border:1px solid var(--sl); background:transparent; color:var(--f2); font-family:var(--fm); font-size:10px; cursor:pointer; min-height:30px; transition:all .15s; }
+.lfb.active { background:var(--vp); color:white; border-color:var(--vp); }
+.lb { max-height:260px; overflow-y:auto; font-family:var(--fm); font-size:11px; }
+.le { display:grid; grid-template-columns:72px 52px 1fr; gap:var(--s1); padding:5px var(--s2); border-bottom:1px solid rgba(255,255,255,.03); align-items:baseline; }
+.lti{color:var(--f2);white-space:nowrap} .lm{color:var(--f1)}
+.ll{font-weight:700;white-space:nowrap}
+.ll.INFO{color:#3498db} .ll.WARN{color:#f1c40f} .ll.ERROR{color:var(--vs)} .ll.DEBUG{color:var(--f2)}
+
+/* ── SERVICE ROW ── */
+.srow { display:flex; align-items:center; gap:var(--s2); padding:12px 0; border-bottom:1px solid var(--sl); min-height:52px; }
+.srow:last-child { border-bottom:none; }
+.srow-info { flex:1; }
+.sn { font-weight:600; font-size:var(--sb); color:var(--f0); }
+.su { font-size:.7rem; color:var(--f2); font-family:var(--fm); margin-top:2px; }
+.srow-right { display:flex; align-items:center; gap:var(--s1); flex-shrink:0; }
+.tm { font-size:.7rem; color:var(--f2); font-family:var(--fm); }
+
+/* ── SEARCH ── */
+.sw { position:relative; margin-bottom:var(--s3); }
+.si { width:100%; height:48px; background:var(--c2); border:1px solid var(--sl); border-radius:var(--rs); color:var(--f0); padding:0 var(--s2) 0 46px; font-family:var(--fu); font-size:var(--sb); transition:border-color .15s; -webkit-appearance:none; appearance:none; }
+.si::-webkit-search-decoration,.si::-webkit-search-cancel-button { display:none; }
+.si:focus { border-color:var(--vp); box-shadow:0 0 0 3px var(--vsu); outline:none; }
+.si::placeholder { color:var(--f2); }
+.sic { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--f2); pointer-events:none; }
+
+/* ── SELECT ── */
+.selw { position:relative; }
+.sel { width:100%; height:44px; background:var(--c2); border:1px solid var(--sl); border-radius:var(--rs); color:var(--f0); padding:0 40px 0 var(--s2); font-family:var(--fu); font-size:var(--sb); appearance:none; -webkit-appearance:none; cursor:pointer; }
+.sel:focus { border-color:var(--vp); outline:none; }
+.sa { position:absolute; right:14px; top:50%; transform:translateY(-50%); pointer-events:none; color:var(--f2); }
+
+/* ── PIPELINE ── */
+.pl { display:flex; align-items:center; overflow-x:auto; padding:var(--s1) 0 var(--s2); gap:0; scrollbar-width:thin; }
+.pn { flex-shrink:0; background:var(--c2); border:1px solid var(--sl); border-radius:var(--rs); padding:10px 14px; font-size:.7rem; font-weight:600; font-family:var(--fm); text-align:center; min-width:78px; }
+.pn.act { border-color:var(--vp); color:var(--vs); box-shadow:0 0 12px var(--vg); }
+.pa { flex-shrink:0; color:var(--f2); font-size:16px; padding:0 3px; }
+
+/* ── WORKFLOW STEPS ── */
+.ww { display:flex; flex-direction:column; }
+.ws { display:flex; gap:var(--s2); padding-bottom:var(--s3); }
+.ws:last-child { padding-bottom:0; }
+.wsl { display:flex; flex-direction:column; align-items:center; }
+.wn { width:34px; height:34px; border-radius:50%; background:var(--vp); color:white; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.7rem; flex-shrink:0; box-shadow:0 0 12px var(--vg); }
+.wli { width:2px; flex:1; background:linear-gradient(to bottom,var(--vp),var(--sl)); margin-top:4px; min-height:20px; }
+.ws:last-child .wli { display:none; }
+.wb { padding-top:4px; flex:1; }
+.wtit { font-weight:700; font-size:var(--sb); margin-bottom:4px; color:var(--f0); }
+.wde  { font-size:var(--ss); color:var(--f2); line-height:1.6; }
+
+/* ── MEMORY ARCH ── */
+.mem-arch { display:flex; flex-direction:column; gap:var(--s1); padding:var(--s2); background:var(--c1); border:1px solid var(--sl); border-radius:var(--r); }
+.mem-layer { display:flex; align-items:center; gap:var(--s2); padding:var(--s2); border-radius:var(--rs); border:1px solid var(--sl); background:var(--c2); }
+.mem-li { width:38px; height:38px; border-radius:var(--rs); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+.mem-lb { flex:1; }
+.mem-lt { font-weight:700; font-size:.7rem; margin-bottom:2px; }
+.mem-ld { font-size:10px; color:var(--f2); line-height:1.4; }
+.mem-conn { display:flex; align-items:center; justify-content:center; padding:4px 0; color:var(--f2); font-size:10px; font-family:var(--fm); gap:6px; }
+.mem-conn::before,.mem-conn::after { content:''; flex:1; height:1px; background:linear-gradient(to right,transparent,var(--sl)); }
+.mem-conn::after { background:linear-gradient(to left,transparent,var(--sl)); }
+
+/* ── MEMORY BARS ── */
+.mw  { margin:var(--s1) 0; }
+.ml  { display:flex; justify-content:space-between; margin-bottom:5px; font-size:.7rem; color:var(--f1); }
+.mbar{ height:8px; background:var(--sl); border-radius:100px; overflow:hidden; }
+.mf  { height:100%; border-radius:100px; }
+.mf.fs { background:linear-gradient(90deg,#3498db,#9b59b6); width:65%; }
+.mf.fv { background:linear-gradient(90deg,var(--vp),#f39c12); width:82%; }
+.mf.fl { background:linear-gradient(90deg,#27ae60,#2ecc71); width:41%; }
+
+/* ── STAT GRID ── */
+.sg { display:grid; grid-template-columns:1fr 1fr; gap:var(--s2); }
+.sc { background:var(--c2); border:1px solid var(--sl); border-radius:var(--r); padding:var(--s2); }
+.sv { font-size:var(--st); font-weight:800; color:var(--vs); }
+.sl2{ font-size:.7rem; color:var(--f2); margin-top:3px; }
+
+/* ── WHAT IS OPENCLAW ── */
+.what-block { background:linear-gradient(135deg,rgba(192,57,43,.12),rgba(192,57,43,.03)); border:1px solid rgba(192,57,43,.3); border-radius:var(--r); padding:var(--s3); }
+.what-row { display:flex; flex-direction:column; gap:var(--s1); margin-top:var(--s2); }
+.what-item { padding:var(--s2); background:rgba(0,0,0,.2); border-radius:var(--rs); border:1px solid var(--sl); display:flex; gap:var(--s2); align-items:flex-start; }
+.wi-icon { font-size:20px; flex-shrink:0; line-height:1; margin-top:1px; }
+.wi-title { font-size:.75rem; font-weight:700; margin-bottom:3px; color:var(--f0); }
+.wi-desc  { font-size:11px; color:var(--f2); line-height:1.5; }
+
+/* ── PREREQS ── */
+.prereq-grid { display:flex; flex-direction:column; gap:var(--s1); }
+.prereq-item { padding:var(--s2); background:var(--c2); border:1px solid var(--sl); border-radius:var(--rs); display:flex; gap:var(--s2); align-items:flex-start; }
+.prereq-icon  { font-size:18px; flex-shrink:0; margin-top:1px; }
+.prereq-title { font-size:.75rem; font-weight:700; color:var(--f0); margin-bottom:2px; }
+.prereq-val   { font-size:11px; color:var(--vs); font-family:var(--fm); }
+
+/* ── CHECKLIST ── */
+.checklist { display:flex; flex-direction:column; gap:var(--s1); }
+.chk-item { display:flex; align-items:flex-start; gap:var(--s2); padding:var(--s2); background:var(--c2); border:1px solid var(--sl); border-radius:var(--rs); cursor:pointer; transition:border-color .15s; min-height:44px; }
+.chk-item:hover { border-color:var(--sm); }
+.chk-item.done { border-color:rgba(46,204,113,.4); background:rgba(46,204,113,.05); }
+.chk-box { width:22px; height:22px; border-radius:6px; border:2px solid var(--sl); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .2s; margin-top:1px; }
+.chk-item.done .chk-box { background:#27ae60; border-color:#27ae60; }
+.chk-check { font-size:13px; color:white; display:none; }
+.chk-item.done .chk-check { display:block; }
+.chk-body { flex:1; }
+.chk-title{ font-weight:600; font-size:var(--sb); margin-bottom:2px; color:var(--f0); }
+.chk-sub  { font-size:.7rem; color:var(--f2); }
+.chk-progress { display:flex; align-items:center; gap:var(--s1); margin-bottom:var(--s2); }
+.chk-prog-bar  { flex:1; height:6px; background:var(--sl); border-radius:100px; overflow:hidden; }
+.chk-prog-fill { height:100%; background:linear-gradient(90deg,#27ae60,#2ecc71); border-radius:100px; transition:width .4s cubic-bezier(.4,0,.2,1); }
+.chk-prog-txt  { font-size:.7rem; font-family:var(--fm); color:var(--vs); white-space:nowrap; min-width:36px; text-align:right; }
+
+/* ── GLOSSARY / FAQ ── */
+.glist { display:flex; flex-direction:column; gap:6px; }
+.gterm { background:var(--c2); border:1px solid var(--sl); border-radius:var(--rs); overflow:hidden; }
+.gterm-q { display:flex; align-items:center; gap:var(--s1); padding:var(--s1) var(--s2); cursor:pointer; min-height:48px; }
+.gterm-word  { font-family:var(--fm); font-size:.7rem; color:var(--vs); font-weight:700; flex-shrink:0; }
+.gterm-short { font-size:.7rem; color:var(--f2); flex:1; }
+.gterm-body  { display:none; padding:var(--s2); border-top:1px solid var(--sl); font-size:.75rem; color:var(--f1); line-height:1.65; background:var(--c1); }
+.gterm.open .gterm-body { display:block; }
+
+/* ── RECOMMENDED CARD ── */
+.rec-card { background:linear-gradient(135deg,rgba(192,57,43,.12),rgba(192,57,43,.04)); border:1px solid var(--vp); border-radius:var(--r); padding:var(--s3); padding-top:calc(var(--s3) + 14px); position:relative; overflow:hidden; }
+.rec-card::before { content:'⭐ BEST FOR BEGINNERS'; position:absolute; top:0; right:0; background:var(--vp); color:white; font-size:9px; font-weight:800; letter-spacing:.06em; padding:4px 10px; border-bottom-left-radius:var(--rs); font-family:var(--fm); }
+
+/* ── CALLOUT BANNERS ── */
+.hib { background:var(--vsu); border-left:3px solid var(--vp); border-radius:0 var(--rs) var(--rs) 0; padding:var(--s2); }
+.iib { background:rgba(52,152,219,.08); border-left:3px solid #3498db; border-radius:0 var(--rs) var(--rs) 0; padding:var(--s2); }
+.wib { background:rgba(241,196,15,.07); border-left:3px solid #f1c40f; border-radius:0 var(--rs) var(--rs) 0; padding:var(--s2); }
+
+/* ── TOOLTIP ── */
+.tip { position:relative; cursor:help; border-bottom:1px dashed var(--vs); color:var(--vs); }
+.tip::after { content:attr(data-tip); position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%); background:var(--c2); border:1px solid var(--sl); color:var(--f0); font-size:11px; font-family:var(--fm); padding:6px 10px; border-radius:6px; pointer-events:none; opacity:0; transition:opacity .2s; z-index:500; max-width:200px; white-space:normal; text-align:center; }
+.tip:hover::after { opacity:1; }
+
+/* ── UTIL ── */
+.mt1{margin-top:var(--s1)} .mt2{margin-top:var(--s2)} .mt3{margin-top:var(--s3)}
+.mb1{margin-bottom:var(--s1)} .mb2{margin-bottom:var(--s2)} .mb3{margin-bottom:var(--s3)}
+.tv{color:var(--vs)} .mono{font-family:var(--fm)}
+
+/* ── INSTALL BANNER ── */
+.ib { display:none; position:fixed; bottom:calc(var(--navH) + 10px); left:var(--s2); right:var(--s2); background:var(--c2); border:1px solid var(--vp); border-radius:var(--r); padding:var(--s2); z-index:300; flex-direction:column; gap:var(--s1); }
+.ib.vis { display:flex; }
+
+/* ── LIGHT MODE ── */
+body.light-mode { --c0:#F0F0F0; --c1:#E8E8E8; --c2:#FFFFFF; --sl:#DEDEDE; --sm:#CACACA; --f0:#111; --f1:#333; --f2:#666; }
+body.light-mode .cb { background:#1E293B; }
+
+/* ── BUTTONS ── */
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:var(--s1); min-height:44px; padding:0 var(--s2); border-radius:var(--rs); border:none; font-family:var(--fu); font-size:var(--sb); font-weight:600; cursor:pointer; transition:all .15s; text-decoration:none; }
+.btn-p { background:var(--vp); color:white; }
+.btn-p:hover { background:var(--vs); }
+.btn-g { background:var(--c2); color:var(--f1); border:1px solid var(--sl); }
+.btn-g:hover { background:var(--sl); color:var(--f0); }
+</style>
+</head>
+<body>
+
+<!-- PROGRESS BAR -->
+<div id="progressBar"><div id="progressFill"></div></div>
+
+<!-- TOPBAR -->
+<header id="topbar">
+  <div class="tb-brand">
+    <div class="tb-logo">✦</div>
+    <div class="tb-title">OpenClaw</div>
+  </div>
+  <div class="tb-acts">
+    <span class="tb-ver">v2026.3</span>
+    <button class="icon-btn" id="themeToggle" aria-label="Toggle theme">🌙</button>
+  </div>
+</header>
+
+<!-- SCROLL WRAP — one container, all pages inside -->
+<div id="scrollWrap">
+
+<!-- ═══════════════ HOME ═══════════════ -->
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="he">✦ OpenClaw Platform</div>
+    <h1>The 2026<br>Agent OS.</h1>
+    <p class="hs">Orchestrate local and cloud AI models, manage memory pipelines, and deploy autonomous agent workflows at scale.</p>
+    <div class="hc">
+      <span class="hch">Agent Runtime</span>
+      <span class="hch">Model Router</span>
+      <span class="hch">Vector Memory</span>
+      <span class="hch">CLI Tools</span>
+    </div>
+  </div>
+
+  <div class="pi" style="padding-top:var(--s2)">
+
+    <!-- WHAT IS OPENCLAW -->
+    <div class="what-block mb3">
+      <h2>What is OpenClaw?</h2>
+      <p style="font-size:var(--ss);margin-top:var(--s1);margin-bottom:var(--s1)">OpenClaw is a <strong>free, open-source platform</strong> that lets you run AI agents on your own computer or connect them to cloud AI services — without writing complex code from scratch.</p>
+      <p style="font-size:var(--ss)">Think of it like a <strong>traffic controller for AI</strong>: you describe what you want done, and OpenClaw figures out which model to use, what tools to call, and how to remember past conversations.</p>
+      <div class="what-row">
+        <div class="what-item">
+          <div class="wi-icon">🤖</div>
+          <div><div class="wi-title">Run AI Agents</div><div class="wi-desc">Autonomous programs that think, use tools, and complete tasks for you</div></div>
+        </div>
+        <div class="what-item">
+          <div class="wi-icon">🧠</div>
+          <div><div class="wi-title">Manage Memory</div><div class="wi-desc">Agents remember past sessions and retrieve relevant context automatically</div></div>
+        </div>
+        <div class="what-item">
+          <div class="wi-icon">🔌</div>
+          <div><div class="wi-title">Connect Models</div><div class="wi-desc">Switch between local AI and cloud APIs depending on your needs</div></div>
+        </div>
+        <div class="what-item">
+          <div class="wi-icon">🔧</div>
+          <div><div class="wi-title">Use Tools</div><div class="wi-desc">Agents can browse the web, read files, run code, and call any API</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SYSTEM REQUIREMENTS -->
+    <div class="sh"><h2>System Requirements</h2><p>What you need before installing.</p></div>
+    <div class="prereq-grid mb3">
+      <div class="prereq-item"><div class="prereq-icon">💻</div><div><div class="prereq-title">OS</div><div class="prereq-val">macOS 13+ · Ubuntu 22+ · Win 11 WSL2</div></div></div>
+      <div class="prereq-item"><div class="prereq-icon">🐍</div><div><div class="prereq-title">Python</div><div class="prereq-val">3.10 or higher</div></div></div>
+      <div class="prereq-item"><div class="prereq-icon">📦</div><div><div class="prereq-title">Node.js</div><div class="prereq-val">v20+ (for CLI tools)</div></div></div>
+      <div class="prereq-item"><div class="prereq-icon">💾</div><div><div class="prereq-title">RAM</div><div class="prereq-val">8 GB min · 16 GB+ for local models</div></div></div>
+      <div class="prereq-item"><div class="prereq-icon">🖥️</div><div><div class="prereq-title">GPU (Optional)</div><div class="prereq-val">NVIDIA 8 GB VRAM+ for local inference</div></div></div>
+      <div class="prereq-item"><div class="prereq-icon">💿</div><div><div class="prereq-title">Disk</div><div class="prereq-val">20 GB free (50 GB+ with local models)</div></div></div>
+    </div>
+
+    <!-- START HERE CHECKLIST -->
+    <div class="sh"><h2>🚀 Start Here</h2><p>Complete in order. Tap to mark done.</p></div>
+    <div class="chk-progress">
+      <div class="chk-prog-bar"><div class="chk-prog-fill" id="chkFill" style="width:0%"></div></div>
+      <span class="chk-prog-txt" id="chkText">0 / 6</span>
+    </div>
+    <div class="checklist mb3" id="checklist">
+      <div class="chk-item" onclick="toggleCheck(this)"><div class="chk-box"><span class="chk-check">✓</span></div><div class="chk-body"><div class="chk-title">1. Verify system requirements</div><div class="chk-sub">OS, Python 3.10+, Node 20+ installed</div></div></div>
+      <div class="chk-item" onclick="toggleCheck(this)"><div class="chk-box"><span class="chk-check">✓</span></div><div class="chk-body"><div class="chk-title">2. Install OpenClaw CLI</div><div class="chk-sub">Run the install script below</div></div></div>
+      <div class="chk-item" onclick="toggleCheck(this)"><div class="chk-box"><span class="chk-check">✓</span></div><div class="chk-body"><div class="chk-title">3. Initialize workspace</div><div class="chk-sub">Run <code>claw init</code> to create your first project</div></div></div>
+      <div class="chk-item" onclick="toggleCheck(this)"><div class="chk-box"><span class="chk-check">✓</span></div><div class="chk-body"><div class="chk-title">4. Choose a model</div><div class="chk-sub">API model (no GPU) or local model (needs GPU)</div></div></div>
+      <div class="chk-item" onclick="toggleCheck(this)"><div class="chk-box"><span class="chk-check">✓</span></div><div class="chk-body"><div class="chk-title">5. Start all services</div><div class="chk-sub">Run <code>claw services start --all</code></div></div></div>
+      <div class="chk-item" onclick="toggleCheck(this)"><div class="chk-box"><span class="chk-check">✓</span></div><div class="chk-body"><div class="chk-title">6. Run your first agent</div><div class="chk-sub">Deploy the example workflow</div></div></div>
+    </div>
+
+    <div class="sg mb3">
+      <div class="sc"><div class="sv">14</div><div class="sl2">Active Services</div></div>
+      <div class="sc"><div class="sv">99.7%</div><div class="sl2">Uptime 30d</div></div>
+      <div class="sc"><div class="sv">3.2M</div><div class="sl2">Tokens Processed</div></div>
+      <div class="sc"><div class="sv">128</div><div class="sl2">Agents Deployed</div></div>
+    </div>
+
+    <div class="sdiv"></div>
+
+    <!-- QUICK START -->
+    <div class="sh"><h2>Quick Start</h2><p>Run in order. Each command is explained below it.</p></div>
+
+    <div class="mb2">
+      <div class="cb"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><span class="ck">curl</span> -sSL https://openclaw.io/install.sh <span class="co">|</span> bash</pre></div>
+      <div class="cmd-explain">📥 Downloads and runs the OpenClaw installer. Sets up the <code>claw</code> command. Safe to re-run.</div>
+    </div>
+    <div class="mb2">
+      <div class="cb"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><span class="ck">claw</span> init --workspace <span class="cs">./my-agents</span></pre></div>
+      <div class="cmd-explain">📁 Creates a new project folder with a default config file and example agent templates.</div>
+    </div>
+    <div class="mb2">
+      <div class="cb"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><span class="ck">claw</span> services start --all</pre></div>
+      <div class="cmd-explain">▶️ Starts all background processes (router, memory, tools, API). Must run before deploying agents.</div>
+    </div>
+    <div class="mb3">
+      <div class="cb"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><span class="ck">claw</span> ui --port <span class="cn">8080</span></pre></div>
+      <div class="cmd-explain">🖥️ Opens the web dashboard at <code>http://localhost:8080</code> to monitor agents visually.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════ SERVICES ═══════════════ -->
+<section class="page" id="page-services">
+  <div class="pi">
+    <div class="sh"><h2>Running Services</h2><p>Real-time status of all daemon processes and background agents.</p></div>
+
+    <div class="sw">
+      <svg class="sic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input class="si" type="search" id="serviceSearch" placeholder="Search services…" aria-label="Search services">
+    </div>
+
+    <div class="card mb3" id="serviceList">
+      <div class="srow" data-service="claw-core"><span class="sdot g"></span><div class="srow-info"><div class="sn">claw-core</div><div class="su">PID 1042 · 128 MB</div></div><div class="srow-right"><span class="badge bg">Running</span><span class="tm">2d 4h</span></div></div>
+      <div class="srow" data-service="claw-router"><span class="sdot g"></span><div class="srow-info"><div class="sn">claw-router</div><div class="su">PID 1088 · 64 MB</div></div><div class="srow-right"><span class="badge bg">Running</span><span class="tm">2d 4h</span></div></div>
+      <div class="srow" data-service="claw-memory"><span class="sdot y"></span><div class="srow-info"><div class="sn">claw-memory</div><div class="su">PID 1104 · 512 MB</div></div><div class="srow-right"><span class="badge by">High Load</span><span class="tm">1d 18h</span></div></div>
+      <div class="srow" data-service="claw-embed"><span class="sdot g"></span><div class="srow-info"><div class="sn">claw-embed</div><div class="su">PID 1122 · 256 MB</div></div><div class="srow-right"><span class="badge bg">Running</span><span class="tm">2d 4h</span></div></div>
+      <div class="srow" data-service="claw-tools"><span class="sdot g"></span><div class="srow-info"><div class="sn">claw-tools</div><div class="su">PID 1199 · 96 MB</div></div><div class="srow-right"><span class="badge bg">Running</span><span class="tm">2d 4h</span></div></div>
+      <div class="srow" data-service="claw-events"><span class="sdot r"></span><div class="srow-info"><div class="sn">claw-events</div><div class="su">PID — · —</div></div><div class="srow-right"><span class="badge br">Stopped</span><span class="tm">—</span></div></div>
+      <div class="srow" data-service="claw-api"><span class="sdot g"></span><div class="srow-info"><div class="sn">claw-api</div><div class="su">PID 1301 · 192 MB</div></div><div class="srow-right"><span class="badge bg">Running</span><span class="tm">2d 4h</span></div></div>
+    </div>
+
+    <div class="sh"><h2>Service CLI Commands</h2><p>Each command explained so you know what it does.</p></div>
+    <div class="mb2">
+      <div class="cb"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><span class="ck">claw</span> services list</pre></div>
+      <div class="cmd-explain">📋 Prints a table of all services: status, PID, memory, uptime. Run first after any restart.</div>
+    </div>
+    <div class="mb2">
+      <div class="cb"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><span class="ck">claw</span> services start claw-events</pre></div>
+      <div class="cmd-explain">▶️ Starts a stopped service by name. Replace <code>claw-events</code> with any service name.</div>
+    </div>
+    <div class="mb2">
+      <div class="cb"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><span class="ck">claw</span> services restart --health-wait <span class="cn">30</span></pre></div>
+      <div class="cmd-explain">🔄 Restarts all services. Waits 30 s for each health check to pass before marking ready.</div>
+    </div>
+    <div class="mb3">
+      <div class="cb"><button class="copy-btn" onclick="copyCode(this)">Copy</button><pre><span class="ck">claw</span> logs claw-router --tail <span class="cn">100</span> --follow</pre></div>
+      <div class="cmd-explain">📜 Streams the last 100 log lines in real-time. Press Ctrl+C to exit.</div>
+    </div>
+
+    <div class="sh"><h2>Live Log Viewer</h2></div>
+    <div class="lv mb3">
+      <div class="lt">
+        <button class="lfb active" data-filter="ALL" onclick="filterLogs(this)">ALL</button>
+        <button class="lfb" data-filter="INFO" onclick="filterLogs(this)">INFO</button>
+        <button class="lfb" data-filter="WARN" onclick="filterLogs(this)">WARN</button>
+        <button class="lfb" data-filter="ERROR" onclick="filterLogs(this)">ERROR</button>
+        <button class="lfb" data-filter="DEBUG" onclick="filterLogs(this)">DEBUG</button>
+      </div>
+      <div class="lb" id="logBody">
+        <div class="le" data-level="INFO"><span class="lti">09:14:02</span><span class="ll INFO">INFO</span><span class="lm">claw-core: Runtime initialized. Agents: 128</span></div>
+        <div class="le" data-level="INFO"><span class="lti">09:14:03</span><span class="ll INFO">INFO</span><span class="lm">claw-router: Model pool ready. Local: 4, API: 3</span></div>
+        <div class="le" data-level="DEBUG"><span class="lti">09:14:04</span><span class="ll DEBUG">DEBUG</span><span class="lm">claw-memory: Embedding store loaded. 48,291 vectors</span></div>
+        <div class="le" data-level="INFO"><span class="lti">09:14:05</span><span class="ll INFO">INFO</span><span class="lm">claw-tools: Tool registry loaded. 34 tools registered</span></div>
+        <div class="le" data-level="WARN"><span class="lti">09:14:08</span><span class="ll WARN">WARN</span><span class="lm">claw-memory: Context window at 82%. Consider summarization</span></div>
+        <div class="le" data-level="ERROR"><span class="lti">09:14:10</span><span class="ll ERROR">ERROR</span><span class="lm">claw-events: Failed to bind port 7890. Address in use</span></div>
+        <div class="le" data-level="INFO"><span class="lti">09:14:11</span><span class="ll INFO">INFO</span><span class="lm">claw-api: Listening on 0.0.0.0:8080</span></div>
+        <div class="le" data-level="WARN"><span class="lti">09:14:15</span><span class="ll WARN">WARN</span><span class="lm">claw-router: API model latency elevated: 2800ms p95</span></div>
+      </div>
+    </div>
+
+    <div class="sh"><h2>Service Monitoring</h2></div>
+    <div class="hib mb2">
+      <h3 style="margin-bottom:5px">Background Agent Health</h3>
+      <p style="font-size:var(--ss)">All agents are monitored via heartbeat every 5 s. Missing 3 consecutive beats triggers auto-restart with exponential backoff.</p>
+    </div>
+    <div class="cb mb3"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre><span class="cc"># Monitor health in real-time</span>
+<span class="ck">claw</span> agents health --watch
+
+<span class="cc"># Export Prometheus metrics</span>
+<span class="ck">claw</span> metrics --format prometheus > metrics.txt
+
+<span class="cc"># Set alert thresholds</span>
+<span class="ck">claw</span> config set alerts.cpu_threshold <span class="cn">85</span>
+<span class="ck">claw</span> config set alerts.memory_threshold <span class="cn">90</span></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ WORKFLOWS ═══════════════ -->
+<section class="page" id="page-workflows">
+  <div class="pi">
+    <div class="sh"><h2>Agent Workflows</h2><p>Orchestration pipelines define how agents receive tasks, invoke tools, and coordinate multi-step operations.</p></div>
+
+    <div class="sh"><h3 style="color:var(--f0);margin-bottom:4px">Task Routing Pipeline</h3><p style="font-size:var(--ss)">How a task flows through the OpenClaw runtime:</p></div>
+    <div class="pl mb3">
+      <div class="pn act">Input<br>Event</div><div class="pa">→</div>
+      <div class="pn">Task<br>Router</div><div class="pa">→</div>
+      <div class="pn">Model<br>Selector</div><div class="pa">→</div>
+      <div class="pn">Agent<br>Pool</div><div class="pa">→</div>
+      <div class="pn">Tool<br>Runner</div><div class="pa">→</div>
+      <div class="pn">Memory<br>Write</div><div class="pa">→</div>
+      <div class="pn act">Output<br>Emit</div>
+    </div>
+
+    <div class="sh"><h3 style="color:var(--f0);margin-bottom:8px">Step-by-Step</h3></div>
+    <div class="ww mb3">
+      <div class="ws"><div class="wsl"><div class="wn">1</div><div class="wli"></div></div><div class="wb"><div class="wtit">Event Ingestion</div><div class="wde">Tasks arrive via HTTP webhook, CLI trigger, or event bus. The dispatcher validates schema and assigns a UUID and priority score.</div></div></div>
+      <div class="ws"><div class="wsl"><div class="wn">2</div><div class="wli"></div></div><div class="wb"><div class="wtit">Task Routing</div><div class="wde">The router evaluates task type, required capabilities, and agent availability. Tasks are placed in priority queues by complexity class.</div></div></div>
+      <div class="ws"><div class="wsl"><div class="wn">3</div><div class="wli"></div></div><div class="wb"><div class="wtit">Model Selection</div><div class="wde">Based on latency, privacy, and capability requirements, the model router selects the optimal local or API model. Fallback chains handle unavailability.</div></div></div>
+      <div class="ws"><div class="wsl"><div class="wn">4</div><div class="wli"></div></div><div class="wb"><div class="wtit">Tool Invocation</div><div class="wde">Agents call registered tools (file I/O, web search, code exec, APIs) via the tool registry. Results are validated against schemas before returning.</div></div></div>
+      <div class="ws"><div class="wsl"><div class="wn">5</div><div class="wli"></div></div><div class="wb"><div class="wtit">Memory Checkpoint</div><div class="wde">Agent output and context delta are written to the vector store. Long sessions are summarized automatically at threshold.</div></div></div>
+      <div class="ws"><div class="wsl"><div class="wn">6</div><div class="wli"></div></div><div class="wb"><div class="wtit">Event Emission</div><div class="wde">Results emitted to downstream subscribers. Failed tasks retry with exponential backoff up to 5 times.</div></div></div>
+    </div>
+
+    <div class="sdiv"></div>
+
+    <div class="sh"><h2>Orchestration Config</h2></div>
+    <div class="cb mb3"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre><span class="cc"># workflow.claw.yml</span>
+<span class="ck">name</span>: <span class="cs">research-pipeline</span>
+<span class="ck">version</span>: <span class="cs">"2.0"</span>
+<span class="ck">triggers</span>:
+  - <span class="ck">type</span>: <span class="cs">webhook</span>
+    <span class="ck">path</span>: <span class="cs">/api/research</span>
+<span class="ck">steps</span>:
+  - <span class="ck">id</span>: <span class="cs">gather</span>
+    <span class="ck">agent</span>: <span class="cs">web-searcher</span>
+    <span class="ck">model</span>: <span class="cs">auto</span>
+    <span class="ck">tools</span>: [<span class="cs">web_search</span>, <span class="cs">fetch_url</span>]
+  - <span class="ck">id</span>: <span class="cs">summarize</span>
+    <span class="ck">agent</span>: <span class="cs">summarizer</span>
+    <span class="ck">depends_on</span>: [<span class="cs">gather</span>]
+    <span class="ck">model</span>: <span class="cs">local/llama3-70b</span>
+  - <span class="ck">id</span>: <span class="cs">write</span>
+    <span class="ck">agent</span>: <span class="cs">writer</span>
+    <span class="ck">depends_on</span>: [<span class="cs">summarize</span>]
+    <span class="ck">output</span>: <span class="cs">report.md</span></pre>
+    </div>
+
+    <div class="sh"><h2>Event-Driven Agents</h2></div>
+    <div class="card mb2">
+      <div class="ct mb1">Reactive Triggers</div>
+      <div class="cr">
+        <span class="badge bk">file.changed</span>
+        <span class="badge bk">cron.schedule</span>
+        <span class="badge bk">http.webhook</span>
+        <span class="badge bk">queue.message</span>
+        <span class="badge bk">memory.threshold</span>
+        <span class="badge bk">agent.complete</span>
+      </div>
+      <p style="font-size:var(--ss);margin-top:var(--s1)">Agents subscribe to event streams. When a matching event fires, the agent activates, processes the payload, and emits output events for downstream consumers.</p>
+    </div>
+    <div class="mb3">
+      <div class="cb"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre><span class="cc"># Register event-driven agent</span>
+<span class="ck">claw</span> agents register \
+  --trigger <span class="cs">"file.changed:./docs/**"</span> \
+  --agent <span class="cs">doc-indexer</span> \
+  --model <span class="cs">local/nomic-embed</span>
+
+<span class="cc"># Deploy workflow</span>
+<span class="ck">claw</span> workflow deploy research-pipeline.yml
+
+<span class="cc"># Watch pipeline execution live</span>
+<span class="ck">claw</span> workflow watch research-pipeline</pre>
+      </div>
+      <div class="cmd-explain">🔁 Registers a trigger, deploys the workflow, then tails live execution logs. Press Ctrl+C to stop watching.</div>
+    </div>
+
+    <div class="sh"><h2>Model Routing Rules</h2></div>
+    <div class="cb mb3"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre><span class="cc"># routing.claw.yml</span>
+<span class="ck">routing</span>:
+  <span class="ck">default</span>: <span class="cs">api/claude-sonnet-4</span>
+  <span class="ck">fallback</span>: <span class="cs">local/llama3-8b</span>
+  <span class="ck">rules</span>:
+    - <span class="ck">if</span>: <span class="cs">task.type == "embedding"</span>
+      <span class="ck">use</span>: <span class="cs">local/nomic-embed</span>
+    - <span class="ck">if</span>: <span class="cs">task.tokens > 100000</span>
+      <span class="ck">use</span>: <span class="cs">api/claude-opus-4</span>
+    - <span class="ck">if</span>: <span class="cs">task.privacy == "strict"</span>
+      <span class="ck">use</span>: <span class="cs">local/*</span></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ MODELS ═══════════════ -->
+<section class="page" id="page-models">
+  <div class="pi">
+    <div class="sh"><h2>Supported Models</h2><p>OpenClaw routes between local and cloud API models automatically based on task requirements.</p></div>
+
+    <div class="iib mb3">
+      <h3 style="margin-bottom:4px">⭐ New to OpenClaw? Start Here</h3>
+      <p style="font-size:var(--ss)">API models (Claude, GPT) need only an API key — no GPU required. Recommended for beginners. Local models need significant VRAM but keep data private.</p>
+    </div>
+
+    <div class="sh"><h3 style="color:var(--f0);margin-bottom:var(--s2)">API Models</h3></div>
+    <div style="display:flex;flex-direction:column;gap:var(--s2);margin-bottom:var(--s3)">
+      <div class="rec-card">
+        <div class="ct">Claude Sonnet 4</div>
+        <div class="cd" style="margin-bottom:var(--s2)">Anthropic · Best balance of speed and intelligence</div>
+        <div class="cr"><span class="badge bg">200K ctx</span><span class="badge bb">Fast</span><span class="badge bk">$3/$15 per M</span></div>
+      </div>
+      <div class="card">
+        <div class="ct">GPT-4o Mini <span class="badge by" style="margin-left:6px">💡 Budget</span></div>
+        <div class="cd" style="margin-bottom:var(--s2)">OpenAI · Cheapest capable API model</div>
+        <div class="cr"><span class="badge bg">128K ctx</span><span class="badge bb">Fast</span><span class="badge bk">$0.15/$0.60 per M</span></div>
+      </div>
+      <div class="card">
+        <div class="ct">Claude Opus 4</div>
+        <div class="cd" style="margin-bottom:var(--s2)">Anthropic · Most powerful for complex tasks</div>
+        <div class="cr"><span class="badge bg">200K ctx</span><span class="badge by">Slower</span><span class="badge bk">$15/$75 per M</span></div>
+      </div>
+    </div>
+
+    <div class="sh"><h3 style="color:var(--f0);margin-bottom:var(--s2)">Local Models</h3></div>
+    <div style="display:flex;flex-direction:column;gap:var(--s2);margin-bottom:var(--s3)">
+      <div class="card">
+        <div class="ct">Llama 3 70B</div>
+        <div class="cd" style="margin-bottom:var(--s2)">Meta · Best open-source quality, needs 48 GB VRAM</div>
+        <div class="cr"><span class="badge bg">128K ctx</span><span class="badge br">48 GB VRAM</span><span class="badge bk">Free</span></div>
+      </div>
+      <div class="card">
+        <div class="ct">Llama 3 8B</div>
+        <div class="cd" style="margin-bottom:var(--s2)">Meta · Fast local model, needs 8 GB VRAM</div>
+        <div class="cr"><span class="badge bg">128K ctx</span><span class="badge bb">8 GB VRAM</span><span class="badge bk">Free</span></div>
+      </div>
+      <div class="card">
+        <div class="ct">nomic-embed-text-v2</div>
+        <div class="cd" style="margin-bottom:var(--s2)">Nomic · Embedding model for vector memory</div>
+        <div class="cr"><span class="badge bg">8K ctx</span><span class="badge bb">4 GB VRAM</span><span class="badge bk">Free</span></div>
+      </div>
+    </div>
+
+    <div class="sh"><h2>Model Comparison</h2></div>
+    <div class="tw mb3">
+      <table>
+        <thead><tr><th>Model</th><th>Speed</th><th>Quality</th><th>Cost</th><th>Beginner</th></tr></thead>
+        <tbody>
+          <tr><td>Claude Sonnet 4</td><td class="good">Fast</td><td class="good">★★★★★</td><td class="warn">$$</td><td class="good">✓ Yes</td></tr>
+          <tr><td>GPT-4o Mini</td><td class="good">Fast</td><td class="warn">★★★☆☆</td><td class="good">$</td><td class="good">✓ Yes</td></tr>
+          <tr><td>Claude Opus 4</td><td class="warn">Slow</td><td class="good">★★★★★</td><td class="bad">$$$</td><td class="warn">Advanced</td></tr>
+          <tr><td>Llama 3 70B</td><td class="warn">Medium</td><td class="good">★★★★☆</td><td class="good">Free</td><td class="bad">GPU needed</td></tr>
+          <tr><td>Llama 3 8B</td><td class="good">Fast</td><td class="warn">★★★☆☆</td><td class="good">Free</td><td class="warn">GPU needed</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ MEMORY ═══════════════ -->
+<section class="page" id="page-memory">
+  <div class="pi">
+    <div class="sh"><h2>Memory &amp; Context</h2><p>Three-layer architecture manages agent context efficiently at scale.</p></div>
+
+    <div class="card mb3">
+      <div class="ct mb2">Memory Layer Usage</div>
+      <div class="mw"><div class="ml"><span>Short-Term Session</span><span class="tv mono" style="font-size:.7rem">65%</span></div><div class="mbar"><div class="mf fs"></div></div></div>
+      <div class="mw"><div class="ml"><span>Vector Store</span><span class="tv mono" style="font-size:.7rem">82%</span></div><div class="mbar"><div class="mf fv"></div></div></div>
+      <div class="mw"><div class="ml"><span>Long-Term Archive</span><span class="tv mono" style="font-size:.7rem">41%</span></div><div class="mbar"><div class="mf fl"></div></div></div>
+    </div>
+
+    <div class="sh"><h2>How Memory Layers Connect</h2><p style="font-size:var(--ss)">Data flows down into storage. Retrieval pulls relevant chunks back up into context.</p></div>
+    <div class="mem-arch mb3">
+      <div class="mem-layer" style="border-color:#3498db;background:rgba(52,152,219,.08)">
+        <div class="mem-li" style="background:rgba(52,152,219,.15)">⚡</div>
+        <div class="mem-lb">
+          <div class="mem-lt" style="color:#3498db">Short-Term Session Context</div>
+          <div class="mem-ld">Active conversation buffer · in RAM · cleared on session end · max 64K tokens</div>
+        </div>
+        <span class="badge bb">RAM</span>
+      </div>
+      <div class="mem-conn">writes summaries ↓ · retrieves chunks ↑</div>
+      <div class="mem-layer" style="border-color:var(--vp);background:rgba(192,57,43,.06)">
+        <div class="mem-li" style="background:rgba(192,57,43,.12)">🔮</div>
+        <div class="mem-lb">
+          <div class="mem-lt" style="color:var(--vs)">Vector Memory Store</div>
+          <div class="mem-ld">ChromaDB / Qdrant / pgvector · semantic search · 48 K+ chunks</div>
+        </div>
+        <span class="badge br">Disk</span>
+      </div>
+      <div class="mem-conn">archives digests ↓ · loads on boot ↑</div>
+      <div class="mem-layer" style="border-color:#27ae60;background:rgba(39,174,96,.06)">
+        <div class="mem-li" style="background:rgba(39,174,96,.12)">🗄</div>
+        <div class="mem-lb">
+          <div class="mem-lt" style="color:#2ecc71">Long-Term Archive</div>
+          <div class="mem-ld">SQLite / PostgreSQL · task summaries · user prefs · session digests · permanent</div>
+        </div>
+        <span class="badge bg">DB</span>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:var(--s2);margin-bottom:var(--s3)">
+      <div class="card ca">
+        <div class="ct">⚡ Short-Term Session Context</div>
+        <p style="font-size:var(--ss);margin-top:6px">In-memory conversation buffer holding active agent message history and tool call stack. Limited to the model's context window. Cleared between sessions unless persisted.</p>
+        <div class="iib mt2"><p style="font-size:var(--ss)">Typical context: <strong>8K–64K tokens</strong>. Auto-truncated at 90% threshold by <code>SessionManager</code>.</p></div>
+      </div>
+      <div class="card ca">
+        <div class="ct">🔮 Vector Memory Store</div>
+        <p style="font-size:var(--ss);margin-top:6px">Semantic embedding database storing chunked documents, prior agent outputs, and tool responses. Searched by <span class="tip" data-tip="Measures angle between vectors — 1.0 = identical, 0 = unrelated">cosine similarity</span> for relevant context retrieval.</p>
+        <div class="cb mt2"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre><span class="cc"># Query vector store by meaning</span>
+<span class="ck">claw</span> memory search \
+  <span class="cs">"authentication flow design"</span> \
+  --top-k <span class="cn">5</span> \
+  --min-score <span class="cn">0.75</span></pre>
+        </div>
+      </div>
+      <div class="card ca">
+        <div class="ct">🗄 Long-Term Memory Archive</div>
+        <p style="font-size:var(--ss);margin-top:6px">Persistent structured storage for distilled agent knowledge: decisions, task summaries, learned user preferences, and session digests from summarization loops.</p>
+      </div>
+    </div>
+
+    <div class="sdiv"></div>
+    <div class="sh"><h2>Summarization Loops</h2><p style="font-size:var(--ss)">When context fills up, OpenClaw automatically condenses old messages into a compact summary.</p></div>
+    <div class="pl mb3">
+      <div class="pn">Raw<br>Context</div><div class="pa">→</div>
+      <div class="pn act">Threshold<br>Check</div><div class="pa">→</div>
+      <div class="pn">LLM<br>Summarize</div><div class="pa">→</div>
+      <div class="pn">Summary<br>Embed</div><div class="pa">→</div>
+      <div class="pn">Compressed<br>Context</div>
+    </div>
+    <div class="cb mb3"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre><span class="cc"># Set at what % full to auto-summarize</span>
+<span class="ck">claw</span> config set memory.summarize_threshold <span class="cn">0.85</span>
+
+<span class="cc"># Which model runs the summarization</span>
+<span class="ck">claw</span> config set memory.summarize_model <span class="cs">local/llama3-70b</span>
+
+<span class="cc"># Max tokens a summary can be</span>
+<span class="ck">claw</span> config set memory.summary_max_tokens <span class="cn">512</span>
+
+<span class="cc"># Manually summarize a session now</span>
+<span class="ck">claw</span> memory summarize --session session-id-7823</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ HELP ═══════════════ -->
+<section class="page" id="page-troubleshoot">
+  <div class="pi">
+    <div class="sh"><h2>Troubleshooting</h2><p>Common issues with step-by-step solutions. Difficulty ratings show how complex each fix is.</p></div>
+
+    <div class="sw">
+      <svg class="sic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input class="si" type="search" id="troubleSearch" placeholder="Search issues…" oninput="searchTrouble(this.value)" aria-label="Search issues">
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:var(--s1);margin-bottom:var(--s3)" id="troubleList">
+
+      <div class="trouble-item">
+        <button class="et" onclick="toggleExpand(this)" aria-expanded="false">
+          <div class="et-meta">⚠️ Session Context Getting Too Large</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><span class="diff-med">🟡 Medium</span><svg class="ei" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </button>
+        <div class="eb">
+          <div class="wib mb2"><p style="font-size:var(--ss)"><strong>Symptoms:</strong> Responses degrade, agent forgets early instructions, or "context window exceeded" errors appear.</p></div>
+          <div class="ww">
+            <div class="ws"><div class="wsl"><div class="wn">1</div><div class="wli"></div></div><div class="wb"><div class="wtit">Enable Context Compression</div><div class="wde">Activate sliding window compression to keep the most recent N tokens plus a rolled summary.</div></div></div>
+            <div class="ws"><div class="wsl"><div class="wn">2</div><div class="wli"></div></div><div class="wb"><div class="wtit">Memory Summarization</div><div class="wde">Older message blocks are replaced by compact digests at 80% context threshold.</div></div></div>
+            <div class="ws"><div class="wsl"><div class="wn">3</div><div class="wli"></div></div><div class="wb"><div class="wtit">Switch to RAG Mode</div><div class="wde">Inject only semantically relevant chunks from the vector store instead of full history.</div></div></div>
+          </div>
+          <div class="cb mt2"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre><span class="ck">claw</span> config set context.mode <span class="cs">rag</span>
+<span class="ck">claw</span> config set context.window_compress <span class="cs">true</span>
+<span class="ck">claw</span> config set context.max_tokens <span class="cn">32768</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="trouble-item">
+        <button class="et" onclick="toggleExpand(this)" aria-expanded="false">
+          <div class="et-meta">🔌 Service Fails to Start</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><span class="diff-easy">🟢 Easy</span><svg class="ei" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </button>
+        <div class="eb">
+          <div class="hib mb2"><p style="font-size:var(--ss)">Most startup failures are port conflicts, missing env vars, or corrupted config. Run <code>claw doctor</code> first.</p></div>
+          <div class="cb"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre><span class="cc"># Auto-diagnose startup issues</span>
+<span class="ck">claw</span> doctor
+
+<span class="cc"># Check port conflicts</span>
+<span class="cf">lsof</span> -i :7890 -i :8080
+
+<span class="cc"># Validate config file</span>
+<span class="ck">claw</span> config validate --strict
+
+<span class="cc"># Reset service to defaults</span>
+<span class="ck">claw</span> config reset --service claw-events</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="trouble-item">
+        <button class="et" onclick="toggleExpand(this)" aria-expanded="false">
+          <div class="et-meta">🧩 Memory Configuration Unclear</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><span class="diff-easy">🟢 Easy</span><svg class="ei" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </button>
+        <div class="eb">
+          <div class="iib mb2"><p style="font-size:var(--ss)">Memory has three independent layers. Each must be configured separately.</p></div>
+          <div class="cb"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre><span class="ck">claw</span> memory init \
+  --backend <span class="cs">chromadb</span> \
+  --embed-model <span class="cs">local/nomic-embed</span> \
+  --retrieval-k <span class="cn">8</span> \
+  --similarity <span class="cn">0.72</span>
+
+<span class="ck">claw</span> memory test --verbose</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="trouble-item">
+        <button class="et" onclick="toggleExpand(this)" aria-expanded="false">
+          <div class="et-meta">🐢 High API Latency</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><span class="diff-hard">🔴 Advanced</span><svg class="ei" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </button>
+        <div class="eb">
+          <div class="wib mb2"><p style="font-size:var(--ss)">If p95 latency exceeds 3 s, enable local fallback routing and semantic caching.</p></div>
+          <div class="cb"><button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre><span class="ck">claw</span> config set routing.latency_sla_ms <span class="cn">2000</span>
+<span class="ck">claw</span> config set routing.fallback_on_latency <span class="cs">true</span>
+<span class="ck">claw</span> config set cache.semantic_enabled <span class="cs">true</span>
+<span class="ck">claw</span> config set cache.similarity_threshold <span class="cn">0.95</span></pre>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="sdiv"></div>
+
+    <div class="sh"><h2>FAQ</h2><p>Common questions from new users.</p></div>
+    <div class="glist mb3" id="faqList">
+      <div class="gterm"><div class="gterm-q" onclick="toggleGloss(this.parentElement)"><span class="gterm-word" style="color:var(--f0);font-family:var(--fu);font-size:var(--sb)">Do I need a GPU?</span><svg style="width:16px;height:16px;flex-shrink:0;color:var(--f2);margin-left:auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div><div class="gterm-body">No — API models (Claude, GPT, Gemini) need only an API key and any modern laptop. A GPU is only needed for <em>local</em> models. Beginners should start with an API model.</div></div>
+      <div class="gterm"><div class="gterm-q" onclick="toggleGloss(this.parentElement)"><span class="gterm-word" style="color:var(--f0);font-family:var(--fu);font-size:var(--sb)">Is OpenClaw free?</span><svg style="width:16px;height:16px;flex-shrink:0;color:var(--f2);margin-left:auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div><div class="gterm-body">Yes — OpenClaw is free and open-source (MIT). You only pay for cloud API model usage (Anthropic, OpenAI, etc.) per token. Local models are free after download.</div></div>
+      <div class="gterm"><div class="gterm-q" onclick="toggleGloss(this.parentElement)"><span class="gterm-word" style="color:var(--f0);font-family:var(--fu);font-size:var(--sb)">Does it work on Windows?</span><svg style="width:16px;height:16px;flex-shrink:0;color:var(--f2);margin-left:auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div><div class="gterm-body">Yes, via WSL2. Install WSL2 with Ubuntu 22 first, then follow the Linux guide. Native Windows support is on the 2026 Q3 roadmap.</div></div>
+      <div class="gterm"><div class="gterm-q" onclick="toggleGloss(this.parentElement)"><span class="gterm-word" style="color:var(--f0);font-family:var(--fu);font-size:var(--sb)">Is my data private?</span><svg style="width:16px;height:16px;flex-shrink:0;color:var(--f2);margin-left:auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div><div class="gterm-body">With local models, all data stays on your machine. With API models, prompts are sent to the cloud provider per their privacy policy. Use local models for sensitive data.</div></div>
+      <div class="gterm"><div class="gterm-q" onclick="toggleGloss(this.parentElement)"><span class="gterm-word" style="color:var(--f0);font-family:var(--fu);font-size:var(--sb)">Agent is stuck — what do I do?</span><svg style="width:16px;height:16px;flex-shrink:0;color:var(--f2);margin-left:auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div><div class="gterm-body">Run <code>claw agents kill &lt;agent-id&gt;</code> to force-stop it. Check logs for tool timeouts or context overflow warnings if it happens repeatedly.</div></div>
+    </div>
+
+    <div class="sdiv"></div>
+
+    <div class="sh"><h2>Glossary</h2><p>Plain-English definitions for technical terms in this guide.</p></div>
+    <div class="glist" id="glossaryList">
+      <div class="gterm"><div class="gterm-q" onclick="toggleGloss(this.parentElement)"><span class="gterm-word">Vector Store</span><span class="gterm-short">Searchable AI embedding database</span><svg style="width:14px;height:14px;flex-shrink:0;color:var(--f2)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div><div class="gterm-body">A database storing text as numerical vectors so AI can find "similar meaning" — not just keyword matches. Think smart search that understands context. Examples: ChromaDB, Qdrant, pgvector.</div></div>
+      <div class="gterm"><div class="gterm-q" onclick="toggleGloss(this.parentElement)"><span class="gterm-word">GGUF</span><span class="gterm-short">Compressed model file format</span><svg style="width:14px;height:14px;flex-shrink:0;color:var(--f2)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div><div class="gterm-body">File format for local AI models (.gguf). Numbers after Q (Q4, Q8) indicate compression — Q4 uses 4 bits per weight (smaller/faster), Q8 uses 8 bits (larger/more accurate). Download from HuggingFace.</div></div>
+      <div class="gterm"><div class="gterm-q" onclick="toggleGloss(this.parentElement)"><span class="gterm-word">RAG</span><span class="gterm-short">Retrieval-Augmented Generation</span><svg style="width:14px;height:14px;flex-shrink:0;color:var(--f2)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div><div class="gterm-body">The AI looks up relevant documents before answering instead of relying only on training. Like letting a student consult notes before an exam. Prevents context overflow and improves accuracy.</div></div>
+      <div class="gterm"><div class="gterm-q" onclick="toggleGloss(this.parentElement)"><span class="gterm-word">p95 Latency</span><span class="gterm-short">95th percentile response time</span><svg style="width:14px;height:14px;flex-shrink:0;color:var(--f2)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div><div class="gterm-body">The response time 95% of requests finish within. "2800ms p95" means 95% of requests take ≤2.8 s. A better indicator of real-world performance than average.</div></div>
+      <div class="gterm"><div class="gterm-q" onclick="toggleGloss(this.parentElement)"><span class="gterm-word">Token</span><span class="gterm-short">Unit AI models read text in</span><svg style="width:14px;height:14px;flex-shrink:0;color:var(--f2)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div><div class="gterm-body">A token is roughly ¾ of a word. "OpenClaw" = 2 tokens. Models charge per token and have a maximum context limit in tokens. A 32K context fits ~24,000 words.</div></div>
+      <div class="gterm"><div class="gterm-q" onclick="toggleGloss(this.parentElement)"><span class="gterm-word">Cosine Similarity</span><span class="gterm-short">How "close" two meanings are (0–1)</span><svg style="width:14px;height:14px;flex-shrink:0;color:var(--f2)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div><div class="gterm-body">A number 0–1 measuring semantic similarity. 1.0 = identical meaning, 0.0 = unrelated. OpenClaw uses this to find relevant memories. Default threshold: 0.72.</div></div>
+    </div>
+
+  </div>
+</section>
+
+</div><!-- /scrollWrap -->
+
+<!-- BOTTOM NAV -->
+<nav id="bottomNav">
+  <button class="nav-item active" onclick="navigate('home',this)">
+    <div class="nav-iw"><svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+    <span class="nav-lbl">Home</span>
+  </button>
+  <button class="nav-item" onclick="navigate('services',this)">
+    <div class="nav-iw"><svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+    <span class="nav-lbl">Services</span>
+  </button>
+  <button class="nav-item" onclick="navigate('workflows',this)">
+    <div class="nav-iw"><svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>
+    <span class="nav-lbl">Workflows</span>
+  </button>
+  <button class="nav-item" onclick="navigate('models',this)">
+    <div class="nav-iw"><svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></div>
+    <span class="nav-lbl">Models</span>
+  </button>
+  <button class="nav-item" onclick="navigate('memory',this)">
+    <div class="nav-iw"><svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="12" rx="10" ry="6"/><path d="M2 12c0 3.31 4.48 6 10 6s10-2.69 10-6"/><path d="M2 12c0-3.31 4.48-6 10-6s10 2.69 10 6"/></svg></div>
+    <span class="nav-lbl">Memory</span>
+  </button>
+  <button class="nav-item" onclick="navigate('troubleshoot',this)">
+    <div class="nav-iw"><svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+    <span class="nav-lbl">Help</span>
+  </button>
+</nav>
+
+<!-- INSTALL BANNER -->
+<div class="ib" id="installBanner">
+  <h3>Install OpenClaw Guide</h3>
+  <p style="font-size:var(--ss);color:var(--f2)">Add to home screen for offline access.</p>
+  <div style="display:flex;gap:var(--s1)">
+    <button class="btn btn-p" onclick="installApp()" style="min-height:40px;font-size:var(--ss)">Install</button>
+    <button class="btn btn-g" onclick="dismissInstall()" style="min-height:40px;font-size:var(--ss)">Not now</button>
+  </div>
+</div>
+
+<script>
+// ── NAVIGATION ──
+const scrollWrap = document.getElementById('scrollWrap');
+
+function navigate(pageId, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const page = document.getElementById('page-' + pageId);
+  if (page) page.classList.add('active');
+  if (el) el.classList.add('active');
+  scrollWrap.scrollTop = 0;
+  updateProgress(0);
+}
+
+// ── PROGRESS BAR ──
+const pf = document.getElementById('progressFill');
+function updateProgress(pct) { pf.style.width = Math.min(100, pct) + '%'; }
+scrollWrap.addEventListener('scroll', function() {
+  const total = scrollWrap.scrollHeight - scrollWrap.clientHeight;
+  updateProgress(total > 0 ? (scrollWrap.scrollTop / total) * 100 : 0);
+}, { passive: true });
+
+// ── THEME ──
+document.getElementById('themeToggle').addEventListener('click', function() {
+  document.body.classList.toggle('light-mode');
+  this.textContent = document.body.classList.contains('light-mode') ? '☀️' : '🌙';
+});
+
+// ── EXPAND/COLLAPSE ──
+function toggleExpand(btn) {
+  const body = btn.nextElementSibling;
+  const open = btn.classList.contains('open');
+  btn.classList.toggle('open', !open);
+  body.classList.toggle('open', !open);
+  btn.setAttribute('aria-expanded', String(!open));
+}
+
+// ── GLOSSARY / FAQ ──
+function toggleGloss(el) { el.classList.toggle('open'); }
+
+// ── CHECKLIST ──
+function toggleCheck(item) {
+  item.classList.toggle('done');
+  const all  = document.querySelectorAll('#checklist .chk-item').length;
+  const done = document.querySelectorAll('#checklist .chk-item.done').length;
+  document.getElementById('chkFill').style.width = Math.round(done/all*100) + '%';
+  document.getElementById('chkText').textContent = done + ' / ' + all;
+}
+
+// ── COPY CODE ──
+function copyCode(btn) {
+  const pre = btn.closest('.cb').querySelector('pre');
+  navigator.clipboard.writeText(pre.textContent).then(() => {
+    btn.textContent = '✓ Done'; btn.style.background = 'var(--vp)'; btn.style.color = 'white';
+    setTimeout(() => { btn.textContent = 'Copy'; btn.style.background = ''; btn.style.color = ''; }, 1800);
+  }).catch(() => { btn.textContent = 'Error'; setTimeout(() => btn.textContent = 'Copy', 1800); });
+}
+
+// ── LOG FILTER ──
+function filterLogs(btn) {
+  document.querySelectorAll('.lfb').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const f = btn.dataset.filter;
+  document.querySelectorAll('.le').forEach(e => { e.style.display = (f === 'ALL' || e.dataset.level === f) ? '' : 'none'; });
+}
+
+// ── SERVICE SEARCH ──
+document.getElementById('serviceSearch').addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  document.querySelectorAll('#serviceList .srow').forEach(r => {
+    r.style.display = r.dataset.service.includes(q) ? '' : 'none';
+  });
+});
+
+// ── TROUBLE SEARCH ──
+function searchTrouble(q) {
+  q = q.toLowerCase();
+  document.querySelectorAll('.trouble-item').forEach(i => {
+    i.style.display = i.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+// ── PWA ──
+if ('serviceWorker' in navigator) {
+  const sw = `const C='oc-v3';self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(['/'])));self.skipWaiting();});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))));self.clients.claim();});self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>caches.match('/'))));});`;
+  navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});
+}
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt=e; document.getElementById('installBanner').classList.add('vis'); });
+function installApp() { if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>{deferredPrompt=null;dismissInstall();});} }
+function dismissInstall() { document.getElementById('installBanner').classList.remove('vis'); }
+</script>
+</body>
+</html>
